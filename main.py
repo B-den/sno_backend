@@ -1,28 +1,33 @@
 import uvicorn
-from fastapi import FastAPI
+from fastapi import FastAPI, Body, Query
 from sqlalchemy import create_engine
 from db.session import engine
 from db.session import SessionLocal
 from db.base import Base
 from db.models.person import Person
+from db.models.password import Password
+from db.funcs import *
 
-engine.connect()
+app = FastAPI()
 
-session = SessionLocal()
+@app.post('/auth')
+async def auth(data=Body(), type: str = Query(default="old")):
+    email = data["email"]
+    password = data["password"]
+    if type == "old":
+        veri = get_user(email)
+        if veri == None:return "Invalid email"
+        if veri.code == password:return True
+        return False
+    if type == "new":
+        return new_user(data)
 
-def create_tables():
-    Base.metadata.create_all(bind=engine)
-
-def drop_tables():
-    Base.metadata.drop_all(engine)
-
-
-#app = FastAPI()
-
-d = Person(id = None, name = 'Mn', nickname = 'mx', email = 'mx@ya.ru', is_active = False)
-
-session.add_all([d])
-session.commit()
+#drop_tables()
+#create_tables()
+#d = Person(name="d", nickname='c', email='d@c', is_active=False)
+#c = Password(code='dfhje', person_id=1)
+#session.add_all([c])
+#session.commit()
 
 #if __name__ == "__main__":
-#    uvicorn.run(app)        # or cmd: uvicorn main:app --reload
+#   uvicorn.run(app)        # or cmd: uvicorn main:app --reload
