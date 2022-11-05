@@ -1,5 +1,6 @@
 import uvicorn
-from fastapi import FastAPI, Body, Query
+import aiofiles
+from fastapi import FastAPI, Body, Query, UploadFile, File
 from sqlalchemy import create_engine
 from db.session import engine
 from db.session import SessionLocal
@@ -15,12 +16,21 @@ async def auth(data=Body(), type: str = Query(default="old")):
     email = data["email"]
     password = data["password"]
     if type == "old":
-        veri = get_user(email)
+        veri = await get_user(email)
         if veri == None:return "Invalid email"
         if veri.code == password:return True
         return False
     if type == "new":
-        return new_user(data)
+        return await new_user(data)
+
+@app.post('/upload_file')
+async def process_file(file: UploadFile):
+    async with aiofiles.open('0.txt', "a") as out:
+        content = await file.read()
+        print(content)
+        await out.write(str(content))
+    await file.close()
+    return {"filename" : file.filename }
 
 #drop_tables()
 #create_tables()

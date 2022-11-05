@@ -16,16 +16,17 @@ def create_tables():
 def drop_tables():
     Base.metadata.drop_all(engine)
 
-def get_users():
+async def get_users():
     return session.query(Person).all()
 
-def get_user(email):
+async def get_user(email):
     p = session.query(Person).filter(Person.email == email).first()
     if p == None: return None
     return p.pw
 
-def new_user(data):
-    if get_user(data["email"]) == None:
+async def new_user(data):
+    r = await get_user(data["email"])
+    if r == None:
         session.add(Person(name = data["username"], email = data["email"], is_active=True))
         session.add(Password(code=data["password"], person_email=data["email"]))
         session.commit()
