@@ -3,3 +3,4 @@ uvicorn=0.18.3
 sqlalchemy=1.4.41
 posgresql=14.5
 aiofiles=22.1.0
+praat-parcelmouth=0.4.2

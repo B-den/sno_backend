@@ -8,6 +8,7 @@ from db.base import Base
 from db.models.person import Person
 from db.models.password import Password
 from db.funcs import *
+from audio.process import process
 
 
 app = FastAPI()
@@ -31,12 +32,10 @@ async def save_file(in_file: UploadFile, out_file_path: str):
 
 @app.post('/upload_file')
 async def process_file(file: UploadFile):
-    #async with aiofiles.open('0.png', "wb") as out:
-    #    content = await file.read()
-    #    await out.write(content)
-    #await save_file(file, '1.png')
+    path = 'sample.' + file.filename.split('.')[-1]
+    await save_file(file, path)
     await file.close()
-    return {"filename" : file.filename }
+    return await process(path)
 
 #drop_tables()
 #create_tables()
